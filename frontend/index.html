@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Astra Yield dApp</title>
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6.6.2/dist/ethers.min.js"></script>
+</head>
+
+<body style="font-family: Arial; padding: 30px;">
+
+<h1>🚀 Astra Yield Protocol</h1>
+
+<button onclick="connectWallet()">Connect Wallet</button>
+<p id="wallet">Not connected</p>
+
+<hr>
+
+<h3>Stake</h3>
+<input id="amount" placeholder="amount" />
+<button onclick="stake()">Stake</button>
+
+<h3>Withdraw</h3>
+<input id="withdrawAmount" />
+<button onclick="withdraw()">Withdraw</button>
+
+<h3>Reward</h3>
+<button onclick="checkReward()">Check Reward</button>
+<p id="reward"></p>
+
+<script>
+let provider;
+let signer;
+
+let stakingAddress = "PASTE_STAKING_ADDRESS";
+let tokenAddress = "PASTE_TOKEN_ADDRESS";
+
+const abi = [
+  "function stake(uint256 amount)",
+  "function withdraw(uint256 amount)",
+  "function reward(address user) view returns (uint256)"
+];
+
+async function connectWallet() {
+  provider = new ethers.BrowserProvider(window.ethereum);
+  await provider.send("eth_requestAccounts", []);
+  signer = await provider.getSigner();
+  document.getElementById("wallet").innerText = await signer.getAddress();
+}
+
+async function stake() {
+  const contract = new ethers.Contract(stakingAddress, abi, signer);
+  const amount = document.getElementById("amount").value;
+  await contract.stake(amount);
+  alert("Staked!");
+}
+
+async function withdraw() {
+  const contract = new ethers.Contract(stakingAddress, abi, signer);
+  const amount = document.getElementById("withdrawAmount").value;
+  await contract.withdraw(amount);
+  alert("Withdraw done!");
+}
+
+async function checkReward() {
+  const contract = new ethers.Contract(stakingAddress, abi, signer);
+  const addr = await signer.getAddress();
+  const reward = await contract.reward(addr);
+  document.getElementById("reward").innerText = reward.toString();
+}
+</script>
+
+</body>
+</html>
